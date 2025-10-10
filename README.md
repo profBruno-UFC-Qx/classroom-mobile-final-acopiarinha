@@ -3,28 +3,30 @@
 # Proposta de aplicativo
 
 ## Equipe
-* **Nome do Aluno(a) 1:** [Seu nome e matrícula]
-* **Nome do Aluno(a) 2:** [Seu nome e matrícula]
-* **Nome do Aluno(a) 3:** [Seu nome e matrícula]
-* ...
-
+* **Nome do Aluno(a) 1:** [Joaquim Ferreira de Sousa Neto - 555018]
+* **Nome do Aluno(a) 2:** [Áquila Costa Medeiros - 553662]
 ---
 
 ## Título do Projeto
-[Escolha um título criativo e descritivo para o seu projeto.]
+[BoletoTrack – Leitor e Lembrete de Boletos]
 
 ## Descrição do Projeto
-[Descreva em 2-3 parágrafos o que o seu projeto faz. Qual é o problema que ele resolve? Quem é o público-alvo? Quais são as principais funcionalidades?]
+[O BoletoTrack é um aplicativo Android desenvolvido em Kotlin com Jetpack Compose, que auxilia o usuário a organizar, ler e gerenciar boletos de forma simples. O app permite importar boletos em PDF ou imagem, extrair automaticamente os dados (valor, vencimento e código de barras) e salvar essas informações localmente para controle futuro.
+
+Seu principal objetivo é evitar esquecimentos de pagamento e centralizar boletos pendentes em um só lugar. O app também oferece modo claro e escuro, notificações automáticas de vencimento, e permite cadastrar, editar e excluir boletos, garantindo uma experiência completa e funcional.]
 
 ---
 
 ## Funcionalidades Principais
 [Liste as principais funcionalidades do projeto. Use caixas de seleção para que a equipe possa marcar as concluídas nas próximas etapas.]
 
-- [ ] Funcionalidade 1: [Breve descrição da funcionalidade]
-- [ ] Funcionalidade 2: [Breve descrição da funcionalidade]
-- [ ] Funcionalidade 3: [Breve descrição da funcionalidade]
-- [ ] ...
+- [ ] Funcionalidade 1: [Cadastrar boletos manualmente (valor, data de vencimento e descrição)]
+- [ ] Funcionalidade 2: [Editar e excluir boletos cadastrados]
+- [ ] Funcionalidade 3: [Persistência local com Room Database]
+- [ ] Funcionalidade 4: [Importar boleto (imagem/PDF) e extrair dados via OCR.Space API]
+- [ ] Funcionalidade 5: [Enviar notificações locais antes do vencimento]
+- [ ] Funcionalidade 6: [Múltiplas telas (Lista de boletos, Cadastro, Detalhes e Histórico)]
+- [ ] Funcionalidade 7: [Uso de MaterialTheme com suporte a modo claro/escuro]
 
 ---
 
