@@ -1,9 +1,13 @@
 package com.example.notificationboleto
 
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -11,14 +15,17 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.example.notificationboleto.navigation.AppNavigation
 import com.example.notificationboleto.navigation.Screen
 import com.example.notificationboleto.ui.theme.NotificationBoletoTheme
+import com.example.notificationboleto.ui.viewmodel.ThemeViewModel
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -26,7 +33,21 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            NotificationBoletoTheme {
+            val themeViewModel: ThemeViewModel = viewModel()
+            val isDarkMode by themeViewModel.isDarkMode
+
+            // Solicitar permissão de notificação no Android 13+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                val launcher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.RequestPermission(),
+                    onResult = { }
+                )
+                LaunchedEffect(Unit) {
+                    launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                }
+            }
+
+            NotificationBoletoTheme(darkTheme = isDarkMode) {
                 val navController = rememberNavController()
                 val backStackEntry by navController.currentBackStackEntryAsState()
 
@@ -35,7 +56,7 @@ class MainActivity : ComponentActivity() {
                         CenterAlignedTopAppBar(
                             title = { Text("Boleto Track") },
                             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                                containerColor = Color.Red,
+                                containerColor = if (isDarkMode) Color.DarkGray else Color.Red,
                                 titleContentColor = Color.White
                             )
                         )
@@ -83,7 +104,10 @@ class MainActivity : ComponentActivity() {
                     Surface(
                         modifier = Modifier.padding(innerPadding)
                     ) {
-                        AppNavigation(navController = navController)
+                        AppNavigation(
+                            navController = navController,
+                            themeViewModel = themeViewModel
+                        )
                     }
                 }
 

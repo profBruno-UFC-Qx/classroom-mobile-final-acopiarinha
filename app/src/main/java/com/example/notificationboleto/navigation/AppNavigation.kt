@@ -10,9 +10,13 @@ import com.example.notificationboleto.ui.history.HistoryScreen
 import com.example.notificationboleto.ui.home.HomeScreen
 import com.example.notificationboleto.ui.settings.SettingsScreen
 import com.example.notificationboleto.ui.viewmodel.BoletoViewModel
+import com.example.notificationboleto.ui.viewmodel.ThemeViewModel
 
 @Composable
-fun AppNavigation(navController: NavHostController) {
+fun AppNavigation(
+    navController: NavHostController,
+    themeViewModel: ThemeViewModel
+) {
 
     val boletoViewModel: BoletoViewModel = viewModel()
 
@@ -36,19 +40,25 @@ fun AppNavigation(navController: NavHostController) {
             AddBoletoScreen(
                 onSaveClick = { valor, vencimento, descricao ->
                     boletoViewModel.addBoleto(valor, vencimento, descricao)
-                    navController.popBackStack() // volta
+                    navController.popBackStack()
                 }
             )
         }
 
         composable(Screen.History.route) {
             HistoryScreen(
-                boletos = boletoViewModel.boletos
+                boletos = boletoViewModel.boletos,
+                onDeleteClick = { id ->
+                    boletoViewModel.deleteBoleto(id)
+                },
+                onUpdateClick = { id, valor, vencimento, descricao ->
+                    boletoViewModel.updateBoleto(id, valor, vencimento, descricao)
+                }
             )
         }
 
         composable(Screen.Settings.route) {
-            SettingsScreen()
+            SettingsScreen(themeViewModel = themeViewModel)
         }
     }
 }
