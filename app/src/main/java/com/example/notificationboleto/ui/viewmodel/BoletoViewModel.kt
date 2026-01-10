@@ -5,72 +5,83 @@ import android.app.Application
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.notificationboleto.data.local.database.AppDatabase
+import com.example.notificationboleto.data.local.entity.BoletoEntity
+import com.example.notificationboleto.data.repository.BoletoRepository
 import com.example.notificationboleto.notifications.BoletoNotificationReceiver
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
-data class BoletoUiModel(
-    val id: String = UUID.randomUUID().toString(),
-    val nome: String,
-    val valor: String,
-    val vencimento: String,
-    val descricao: String
-)
-
 class BoletoViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _boletos = mutableStateListOf<BoletoUiModel>()
-    val boletos: List<BoletoUiModel> = _boletos
+    private val repository: BoletoRepository by lazy {
+        val dao = AppDatabase.getInstance(application).boletoDao()
+        BoletoRepository(dao)
+    }
+
+    private val alarmManager =
+        application.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+    val boletos = repository.getBoletos()
+        .stateIn(
+            viewModelScope,
+            SharingStarted.WhileSubscribed(5_000),
+            emptyList()
+        )
 
     fun addBoleto(nome: String, valor: String, vencimento: String, descricao: String) {
-        val novoBoleto = BoletoUiModel(
+        val boleto = BoletoEntity(
+            id = UUID.randomUUID().toString(),
             nome = nome,
             valor = valor,
             vencimento = vencimento,
             descricao = descricao
         )
-        _boletos.add(novoBoleto)
-        agendarNotificacao(novoBoleto)
-    }
 
-    fun updateBoleto(id: String, nome: String, valor: String, vencimento: String, descricao: String) {
-        val index = _boletos.indexOfFirst { it.id == id }
-        if (index != -1) {
-            val boletoAtualizado = _boletos[index].copy(
-                nome = nome,
-                valor = valor,
-                vencimento = vencimento,
-                descricao = descricao
-            )
-            _boletos[index] = boletoAtualizado
-            agendarNotificacao(boletoAtualizado)
+        viewModelScope.launch {
+            repository.addBoleto(boleto)
+            agendarNotificacao(boleto)
         }
     }
 
-    fun deleteBoleto(id: String) {
-        cancelarNotificacao(id)
-        _boletos.removeIf { it.id == id }
+    fun updateBoleto(id: String, nome: String, valor: String, vencimento: String, descricao: String) {
+        val boleto = BoletoEntity(id, nome, valor, vencimento, descricao)
+
+        viewModelScope.launch {
+            repository.updateBoleto(boleto)
+            agendarNotificacao(boleto)
+        }
     }
 
-    private fun agendarNotificacao(boleto: BoletoUiModel) {
+    fun deleteBoleto(boleto: BoletoEntity) {
+        viewModelScope.launch {
+            cancelarNotificacao(boleto.id)
+            repository.deleteBoleto(boleto)
+        }
+    }
+
+    private fun agendarNotificacao(boleto: BoletoEntity) {
         try {
             val sdf = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            val dataVencimento = sdf.parse(boleto.vencimento) ?: return
-            
-            val calendar = Calendar.getInstance()
-            calendar.time = dataVencimento
-            calendar.add(Calendar.DAY_OF_YEAR, -1) // Subtrai 1 dia
-            calendar.set(Calendar.HOUR_OF_DAY, 9) // Notifica às 9h da manhã
-            calendar.set(Calendar.MINUTE, 0)
-            
+            val data = sdf.parse(boleto.vencimento) ?: return
+
+            val calendar = Calendar.getInstance().apply {
+                time = data
+                add(Calendar.DAY_OF_YEAR, -1)
+                set(Calendar.HOUR_OF_DAY, 9)
+                set(Calendar.MINUTE, 0)
+            }
+
             if (calendar.timeInMillis <= System.currentTimeMillis()) return
 
             val intent = Intent(getApplication(), BoletoNotificationReceiver::class.java).apply {
-                putExtra("titulo", "Vencimento Amanhã!")
-                putExtra("descricao", "Boleto ${boleto.nome} de ${boleto.valor} vence amanhã.")
-                putExtra("id", boleto.id)
+                putExtra("titulo", "Boleto vence amanhã")
+                putExtra("descricao", "${boleto.nome} - ${boleto.valor}")
             }
 
             val pendingIntent = PendingIntent.getBroadcast(
@@ -80,7 +91,6 @@ class BoletoViewModel(application: Application) : AndroidViewModel(application) 
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
 
-            val alarmManager = getApplication<Application>().getSystemService(Context.ALARM_SERVICE) as AlarmManager
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
@@ -99,7 +109,6 @@ class BoletoViewModel(application: Application) : AndroidViewModel(application) 
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        val alarmManager = getApplication<Application>().getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(pendingIntent)
     }
 }

@@ -17,7 +17,6 @@ fun AppNavigation(
     navController: NavHostController,
     themeViewModel: ThemeViewModel
 ) {
-
     val boletoViewModel: BoletoViewModel = viewModel()
 
     NavHost(
@@ -46,15 +45,7 @@ fun AppNavigation(
         }
 
         composable(Screen.History.route) {
-            HistoryScreen(
-                boletos = boletoViewModel.boletos,
-                onDeleteClick = { id ->
-                    boletoViewModel.deleteBoleto(id)
-                },
-                onUpdateClick = { id, nome, valor, vencimento, descricao ->
-                    boletoViewModel.updateBoleto(id, nome, valor, vencimento, descricao)
-                }
-            )
+            HistoryScreen(viewModel = boletoViewModel)
         }
 
         composable(Screen.Settings.route) {

@@ -8,47 +8,39 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.notificationboleto.data.local.entity.BoletoEntity
 import com.example.notificationboleto.ui.add.AddBoletoScreen
-import com.example.notificationboleto.ui.viewmodel.BoletoUiModel
+import com.example.notificationboleto.ui.viewmodel.BoletoViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 
 @Composable
-fun HistoryScreen(
-    boletos: List<BoletoUiModel>,
-    onDeleteClick: (String) -> Unit = {},
-    onUpdateClick: (id: String, nome: String, valor: String, vencimento: String, descricao: String) -> Unit = { _, _, _, _, _ -> }
-) {
-    var boletoParaEditar by remember { mutableStateOf<BoletoUiModel?>(null) }
-    var boletoParaExcluir by remember { mutableStateOf<BoletoUiModel?>(null) }
+fun HistoryScreen(viewModel: BoletoViewModel) {
+    val boletos by viewModel.boletos.collectAsState()
 
-    // Formatação de data e data atual para comparação
+    var boletoParaEditar by remember { mutableStateOf<BoletoEntity?>(null) }
+    var boletoParaExcluir by remember { mutableStateOf<BoletoEntity?>(null) }
+
     val dateFormat = remember { SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()) }
-    val hoje = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }.time
+    val hoje = remember {
+        Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+    }
 
-    // Diálogo de Edição
     if (boletoParaEditar != null) {
         Dialog(onDismissRequest = { boletoParaEditar = null }) {
             Surface(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .wrapContentHeight()
-                    .padding(16.dp),
-                shape = MaterialTheme.shapes.medium,
-                color = MaterialTheme.colorScheme.surface,
-                tonalElevation = 8.dp
+                modifier = Modifier.padding(16.dp),
+                shape = MaterialTheme.shapes.medium
             ) {
                 AddBoletoScreen(
                     initialNome = boletoParaEditar!!.nome,
@@ -56,7 +48,9 @@ fun HistoryScreen(
                     initialVencimento = boletoParaEditar!!.vencimento,
                     initialDescricao = boletoParaEditar!!.descricao,
                     onSaveClick = { n, v, ven, d ->
-                        onUpdateClick(boletoParaEditar!!.id, n, v, ven, d)
+                        viewModel.updateBoleto(
+                            boletoParaEditar!!.id, n, v, ven, d
+                        )
                         boletoParaEditar = null
                     }
                 )
@@ -67,17 +61,14 @@ fun HistoryScreen(
     if (boletoParaExcluir != null) {
         AlertDialog(
             onDismissRequest = { boletoParaExcluir = null },
-            title = { Text("Excluir Boleto") },
-            text = { Text("Tem certeza que deseja excluir este boleto? Esta ação não pode ser desfeita.") },
+            title = { Text("Excluir boleto") },
+            text = { Text("Deseja realmente excluir este boleto?") },
             confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDeleteClick(boletoParaExcluir!!.id)
-                        boletoParaExcluir = null
-                    },
-                    colors = ButtonDefaults.textButtonColors(contentColor = Color.Red)
-                ) {
-                    Text("Excluir")
+                TextButton(onClick = {
+                    viewModel.deleteBoleto(boletoParaExcluir!!)
+                    boletoParaExcluir = null
+                }) {
+                    Text("Excluir", color = Color.Red)
                 }
             },
             dismissButton = {
@@ -89,63 +80,43 @@ fun HistoryScreen(
     }
 
     if (boletos.isEmpty()) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
             Text("Nenhum boleto cadastrado")
         }
-    } else {
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(boletos) { boleto ->
-                // Lógica do Indicador
-                val dataVencimento = try { dateFormat.parse(boleto.vencimento) } catch (e: Exception) { null }
-                val statusIndicator = when {
-                    dataVencimento == null -> ""
-                    dataVencimento.before(hoje) -> "🔴" // Colocado para boletos que se venceram
-                    dataVencimento.after(hoje) -> "🟢"  // Colocado para boletos que ainda tem pelo menos ate "amanha"
-                    else -> "🟡" // Colocado para boletos que se vencem hoje
-                }
+        return
+    }
 
-                Card(
-                    modifier = Modifier.fillMaxWidth(),
-                    elevation = CardDefaults.cardElevation(4.dp)
+    LazyColumn(
+        modifier = Modifier.fillMaxSize().padding(16.dp),
+        verticalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(boletos) { boleto ->
+            val dataVencimento = runCatching { dateFormat.parse(boleto.vencimento) }.getOrNull()
+            val status = when {
+                dataVencimento == null -> ""
+                dataVencimento.before(hoje) -> "🔴"
+                dataVencimento.after(hoje) -> "🟢"
+                else -> "🟡"
+            }
+
+            Card {
+                Row(
+                    modifier = Modifier.padding(16.dp),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .padding(16.dp)
-                            .fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(modifier = Modifier.weight(1f)) {
-                            Text(boleto.nome, style = MaterialTheme.typography.titleMedium)
-                            Text("Valor: ${boleto.valor}", style = MaterialTheme.typography.bodyMedium)
-
-                            Row(verticalAlignment = Alignment.CenterVertically) {
-                                Text(statusIndicator, modifier = Modifier.padding(end = 4.dp))
-                                Text("Vencimento: ${boleto.vencimento}")
-                            }
-
-                            if (boleto.descricao.isNotBlank()) {
-                                Spacer(modifier = Modifier.height(4.dp))
-                                Text(boleto.descricao, style = MaterialTheme.typography.bodySmall)
-                            }
+                    Column(Modifier.weight(1f)) {
+                        Text(boleto.nome, style = MaterialTheme.typography.titleMedium)
+                        Text("Valor: ${boleto.valor}")
+                        Text("$status Vencimento: ${boleto.vencimento}")
+                        if (boleto.descricao.isNotBlank()) {
+                            Text(boleto.descricao, style = MaterialTheme.typography.bodySmall)
                         }
-
-                        Row {
-                            IconButton(onClick = { boletoParaEditar = boleto }) {
-                                Icon(Icons.Default.Edit, contentDescription = "Editar", tint = Color.Blue)
-                            }
-                            IconButton(onClick = { boletoParaExcluir = boleto }) {
-                                Icon(Icons.Default.Delete, contentDescription = "Excluir", tint = Color.Red)
-                            }
-                        }
+                    }
+                    IconButton(onClick = { boletoParaEditar = boleto }) {
+                        Icon(Icons.Default.Edit, null)
+                    }
+                    IconButton(onClick = { boletoParaExcluir = boleto }) {
+                        Icon(Icons.Default.Delete, null, tint = Color.Red)
                     }
                 }
             }
