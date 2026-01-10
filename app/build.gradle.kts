@@ -40,7 +40,6 @@ android {
 }
 
 dependencies {
-
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -53,6 +52,10 @@ dependencies {
     implementation("androidx.compose.ui:ui-text")
     implementation("io.coil-kt:coil-compose:2.6.0")
     implementation(libs.androidx.compose.foundation)
+
+    // ML Kit Text Recognition (Usando a versão do Google Play Services)
+    implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

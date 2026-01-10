@@ -38,8 +38,8 @@ fun AppNavigation(
 
         composable(Screen.AddBoleto.route) {
             AddBoletoScreen(
-                onSaveClick = { valor, vencimento, descricao ->
-                    boletoViewModel.addBoleto(valor, vencimento, descricao)
+                onSaveClick = { nome, valor, vencimento, descricao ->
+                    boletoViewModel.addBoleto(nome, valor, vencimento, descricao)
                     navController.popBackStack()
                 }
             )
@@ -51,8 +51,8 @@ fun AppNavigation(
                 onDeleteClick = { id ->
                     boletoViewModel.deleteBoleto(id)
                 },
-                onUpdateClick = { id, valor, vencimento, descricao ->
-                    boletoViewModel.updateBoleto(id, valor, vencimento, descricao)
+                onUpdateClick = { id, nome, valor, vencimento, descricao ->
+                    boletoViewModel.updateBoleto(id, nome, valor, vencimento, descricao)
                 }
             )
         }

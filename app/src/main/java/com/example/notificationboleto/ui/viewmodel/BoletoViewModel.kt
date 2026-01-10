@@ -13,6 +13,7 @@ import java.util.*
 
 data class BoletoUiModel(
     val id: String = UUID.randomUUID().toString(),
+    val nome: String,
     val valor: String,
     val vencimento: String,
     val descricao: String
@@ -23,8 +24,9 @@ class BoletoViewModel(application: Application) : AndroidViewModel(application) 
     private val _boletos = mutableStateListOf<BoletoUiModel>()
     val boletos: List<BoletoUiModel> = _boletos
 
-    fun addBoleto(valor: String, vencimento: String, descricao: String) {
+    fun addBoleto(nome: String, valor: String, vencimento: String, descricao: String) {
         val novoBoleto = BoletoUiModel(
+            nome = nome,
             valor = valor,
             vencimento = vencimento,
             descricao = descricao
@@ -33,10 +35,11 @@ class BoletoViewModel(application: Application) : AndroidViewModel(application) 
         agendarNotificacao(novoBoleto)
     }
 
-    fun updateBoleto(id: String, valor: String, vencimento: String, descricao: String) {
+    fun updateBoleto(id: String, nome: String, valor: String, vencimento: String, descricao: String) {
         val index = _boletos.indexOfFirst { it.id == id }
         if (index != -1) {
             val boletoAtualizado = _boletos[index].copy(
+                nome = nome,
                 valor = valor,
                 vencimento = vencimento,
                 descricao = descricao
@@ -66,7 +69,7 @@ class BoletoViewModel(application: Application) : AndroidViewModel(application) 
 
             val intent = Intent(getApplication(), BoletoNotificationReceiver::class.java).apply {
                 putExtra("titulo", "Vencimento Amanhã!")
-                putExtra("descricao", "Boleto de ${boleto.valor} vence amanhã.")
+                putExtra("descricao", "Boleto ${boleto.nome} de ${boleto.valor} vence amanhã.")
                 putExtra("id", boleto.id)
             }
 
