@@ -11,7 +11,7 @@
 [BoletoTrack – Leitor e Lembrete de Boletos]
 
 ## Descrição do Projeto
-[O BoletoTrack é um aplicativo Android desenvolvido em Kotlin com Jetpack Compose, que auxilia o usuário a organizar, ler e gerenciar boletos de forma simples. O app permite importar boletos em PDF ou imagem, extrair automaticamente os dados (valor, vencimento e código de barras) e salvar essas informações localmente para controle futuro.
+[O BoletoTrack é um aplicativo Android desenvolvido em Kotlin com Jetpack Compose, que auxilia o usuário a organizar, ler e gerenciar boletos de forma simples. O app permite importar boletos em PDF, extrair automaticamente os dados (valor, vencimento) e salvar essas informações localmente para controle futuro.
 
 Seu principal objetivo é evitar esquecimentos de pagamento e centralizar boletos pendentes em um só lugar. O app também oferece modo claro e escuro, notificações automáticas de vencimento, e permite cadastrar, editar e excluir boletos, garantindo uma experiência completa e funcional.]
 
@@ -20,12 +20,12 @@ Seu principal objetivo é evitar esquecimentos de pagamento e centralizar boleto
 ## Funcionalidades Principais
 [Liste as principais funcionalidades do projeto. Use caixas de seleção para que a equipe possa marcar as concluídas nas próximas etapas.]
 
-- [ ] Funcionalidade 1: [Cadastrar boletos manualmente (valor, data de vencimento e descrição)]
+- [ ] Funcionalidade 1: [Cadastrar boletos manualmente (Nome, Valor, Data de Vencimento e Descrição)]
 - [ ] Funcionalidade 2: [Editar e excluir boletos cadastrados]
 - [ ] Funcionalidade 3: [Persistência local com Room Database]
-- [ ] Funcionalidade 4: [Importar boleto (imagem/PDF) e extrair dados via OCR.Space API]
+- [ ] Funcionalidade 4: [Importar boleto (imagem/PDF) e extrair dados via ML Kit API]
 - [ ] Funcionalidade 5: [Enviar notificações locais antes do vencimento]
-- [ ] Funcionalidade 6: [Múltiplas telas (Lista de boletos, Cadastro, Detalhes e Histórico)]
+- [ ] Funcionalidade 6: [Múltiplas telas (Home, Cadastro de boletos, Lista de boletos e configurações)]
 - [ ] Funcionalidade 7: [Uso de MaterialTheme com suporte a modo claro/escuro]
 
 ---
@@ -34,7 +34,35 @@ Seu principal objetivo é evitar esquecimentos de pagamento e centralizar boleto
 > Daqui em diante o README.md só deve ser preenchido no momento da entrega final.
 
 ##  Tecnologias: 
-Liste aqui as tecnologias e bibliotecas que foram utilizadas no projeto.
+Linguagem e Base
+•Kotlin
+•Jetpack Compose
+•Material Design 3
+
+Arquitetura e Persistência
+•MVVM (Model-View-ViewModel)
+•Room Database
+•Repository Pattern
+•Kotlin Coroutines & Flow
+
+Funcionalidades Inteligentes e OCR
+•Google ML Kit (Text Recognition)
+•Android PdfRenderer
+•Regex (Expressões Regulares)
+
+Agendamento e Notificações
+•WorkManager
+•AlarmManager
+•NotificationManager
+
+Navegação e Imagens
+•Compose Navigation
+•Coil (Compose)
+
+Ferramentas de Build
+•Gradle (Kotlin DSL)
+•Version Catalog (libs.versions.toml)
+•KAPT
 
 ---
 
