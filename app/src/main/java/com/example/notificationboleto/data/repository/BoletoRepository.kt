@@ -8,6 +8,8 @@ class BoletoRepository(private val dao: BoletoDao) {
 
     fun getBoletos(): Flow<List<BoletoEntity>> = dao.getBoletos()
 
+    suspend fun getAllBoletos(): List<BoletoEntity> = dao.getAllBoletos()
+
     suspend fun addBoleto(boleto: BoletoEntity) = dao.insert(boleto)
 
     suspend fun updateBoleto(boleto: BoletoEntity) = dao.update(boleto)

@@ -10,7 +10,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,7 +22,7 @@ fun HomeScreen(
 ) {
     Column(
         modifier = Modifier
-            .padding(24.dp)
+            .padding(35.dp)
             .fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -31,12 +30,14 @@ fun HomeScreen(
         Text(
             text = "Seja bem-vindo ao Boleto Track",
             fontWeight = FontWeight.Bold,
-            fontSize = 20.sp
+            fontSize = 23.sp
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
         Text(
-            text = "Aqui você insere seus boletos e te avisamos quando o prazo de pagamento " +
-                    "está perto de expirar ",
+            text = "Sua ferramenta para gerenciar boletos e te avisar quando o prazo de pagamento " +
+                    "está perto de expirar!",
             fontSize = 18.sp,
             textAlign = TextAlign.Center
         )

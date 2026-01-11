@@ -83,12 +83,12 @@ fun AddBoletoScreen(
 
     fun processText(text: String) {
         val cleanText = text.replace("\n", " ")
-        
+
         val linhaDigitavelRegex = Regex("""\d{5}[\.\s]?\d{5}[\.\s]?\d{5}[\.\s]?\d{6}[\.\s]?\d{5}[\.\s]?\d{6}[\.\s]?\d[\.\s]?\d{14}""")
         val linhaMatch = linhaDigitavelRegex.find(cleanText)
-        
+
         var valorFinal: String? = null
-        
+
         if (linhaMatch != null) {
             val soNumeros = linhaMatch.value.replace(Regex("[^\\d]"), "")
             if (soNumeros.length >= 47) {
@@ -102,7 +102,7 @@ fun AddBoletoScreen(
         if (valorFinal == null) {
             val valorRegex = Regex("""(\d{1,3}(\.\d{3})*,\d{2})""")
             val matches = valorRegex.findAll(cleanText)
-            
+
             val maiorValor = matches.mapNotNull { m ->
                 val num = m.value.replace(".", "").replace(",", ".").toDoubleOrNull()
                 num
@@ -122,7 +122,7 @@ fun AddBoletoScreen(
         dataMatch?.let {
             vencimentoTextFieldValue = TextFieldValue(it.value, TextRange(it.value.length))
         }
-        
+
         isLoading = false
     }
 
@@ -212,7 +212,7 @@ fun AddBoletoScreen(
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                 isError = isVencido
             )
-            
+
             if (isVencido) {
                 Text(
                     text = "Boleto vencido",

@@ -10,6 +10,9 @@ interface BoletoDao {
     @Query("SELECT * FROM boletos ORDER BY vencimento ASC")
     fun getBoletos(): Flow<List<BoletoEntity>>
 
+    @Query("SELECT * FROM boletos")
+    suspend fun getAllBoletos(): List<BoletoEntity>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(boleto: BoletoEntity)
 

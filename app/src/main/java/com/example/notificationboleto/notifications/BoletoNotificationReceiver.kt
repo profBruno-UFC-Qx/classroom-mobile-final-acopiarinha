@@ -7,13 +7,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import androidx.core.app.NotificationCompat
-import com.example.notificationboleto.R
 
 class BoletoNotificationReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val titulo = intent.getStringExtra("titulo") ?: "Lembrete de Boleto"
-        val descricao = intent.getStringExtra("descricao") ?: "Seu boleto vence amanhã!"
-        val id = intent.getStringExtra("id")?.hashCode() ?: 0
+        val descricao = intent.getStringExtra("descricao") ?: "Seu boleto vence hoje!"
+
+        val id = intent.getIntExtra("id", 0)
 
         val channelId = "boleto_notifications"
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -28,7 +28,7 @@ class BoletoNotificationReceiver : BroadcastReceiver() {
         }
 
         val notification = NotificationCompat.Builder(context, channelId)
-            .setSmallIcon(android.R.drawable.ic_dialog_info) // Usando ícone padrão para teste
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
             .setContentTitle(titulo)
             .setContentText(descricao)
             .setPriority(NotificationCompat.PRIORITY_HIGH)

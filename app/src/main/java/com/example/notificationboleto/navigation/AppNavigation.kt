@@ -39,7 +39,9 @@ fun AppNavigation(
             AddBoletoScreen(
                 onSaveClick = { nome, valor, vencimento, descricao ->
                     boletoViewModel.addBoleto(nome, valor, vencimento, descricao)
-                    navController.popBackStack()
+                    navController.navigate(Screen.History.route) {
+                        popUpTo(Screen.Home.route)
+                    }
                 }
             )
         }
